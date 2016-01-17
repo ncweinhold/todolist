@@ -9,6 +9,7 @@ import java.util.List;
  * Created by nick on 17/01/16.
  */
 @RestController
+@RequestMapping("/todos")
 public class TodoController {
 
     @RequestMapping("/")
