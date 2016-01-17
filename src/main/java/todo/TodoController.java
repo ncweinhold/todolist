@@ -1,7 +1,9 @@
 package todo;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by nick on 17/01/16.
@@ -10,7 +12,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class TodoController {
 
     @RequestMapping("/")
-    public String homepage() {
-        return "Hello World";
+    public List<Todo> homepage() {
+        List<Todo> todos = (List<Todo>) todoDao.findAll();
+        return todos;
     }
+
+    @RequestMapping(path="/create", method=RequestMethod.POST)
+    //@ResponseBody
+    public Todo createTodo(@RequestParam(name="title", defaultValue = "Untitled") String title,
+                             @RequestParam(name="description", defaultValue="No description") String description) {
+        Todo todo;
+        try {
+            todo = new Todo(title, description);
+            todoDao.save(todo);
+        } catch (Exception e) {
+            return null;
+        }
+        return todo;
+    }
+
+    @Autowired
+    private TodoDAO todoDao;
 }
