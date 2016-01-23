@@ -1,6 +1,8 @@
 package todo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -8,30 +10,27 @@ import java.util.List;
 /**
  * Created by nick on 17/01/16.
  */
-@RestController
-@RequestMapping("/todos")
+@Controller
 public class TodoController {
+    private TodoRepository todoRepository;
 
-    @RequestMapping("/")
-    public List<Todo> homepage() {
-        List<Todo> todos = (List<Todo>) todoDao.findAll();
-        return todos;
+    @RequestMapping(path="/", method=RequestMethod.GET)
+    public String todoList(Model model) {
+        List<Todo> todos = (List<Todo>) todoRepository.findAll();
+        if (todos != null) {
+            model.addAttribute("todolist", todos);
+        }
+        return "todos";
     }
 
-    @RequestMapping(path="/create", method=RequestMethod.POST)
-    //@ResponseBody
-    public Todo createTodo(@RequestParam(name="title", defaultValue = "Untitled") String title,
-                             @RequestParam(name="description", defaultValue="No description") String description) {
-        Todo todo;
-        try {
-            todo = new Todo(title, description);
-            todoDao.save(todo);
-        } catch (Exception e) {
-            return null;
-        }
-        return todo;
+    @RequestMapping(path="/", method=RequestMethod.POST)
+    public String createTodo(Todo todo) {
+        todoRepository.save(todo);
+        return "redirect:/";
     }
 
     @Autowired
-    private TodoDAO todoDao;
+    public TodoController(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
 }
